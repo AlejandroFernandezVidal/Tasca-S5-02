@@ -15,24 +15,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-//import cat.itacademy.barcelonactiva.fernandezvidal.alejandro.s05.t02.n01.S05T02N01FernandezVidalAlejandro.model.domain.JugadorEntity;
-
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
-		// JugadorEntity jugadorEntity = new JugadorEntity();
 		AuthCredentials authCredentials = new AuthCredentials();
 		try {
-			/* jugadorEntity */authCredentials = new ObjectMapper().readValue(request.getReader(),
-					/* JugadorEntity.class */AuthCredentials.class);
+			authCredentials = new ObjectMapper().readValue(request.getReader(), AuthCredentials.class);
 		} catch (IOException e) {
 		}
 
 		UsernamePasswordAuthenticationToken usernamePAT = new UsernamePasswordAuthenticationToken(
-				/* jugadorEntity.getNombre() */authCredentials.getNombre(),
-				/* jugadorEntity.getPassword() */authCredentials.getPassword(), Collections.emptyList());
+				authCredentials.getNombre(), authCredentials.getPassword(), Collections.emptyList());
 
 		return getAuthenticationManager().authenticate(usernamePAT);
 	}

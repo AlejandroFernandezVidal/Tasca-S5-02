@@ -20,70 +20,31 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig {
-	
+
 	private final UserDetailsService userDetailsService;
 	private final JWTAuthorizationFilter jwtAuthorizationFilter;
-	
+
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-		
+
 		JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter();
 		jwtAuthenticationFilter.setAuthenticationManager(authManager);
 		jwtAuthenticationFilter.setFilterProcessesUrl("/login");
-		
-		return http
-				.csrf().disable()
-				.authorizeRequests()
-				.antMatchers(HttpMethod.POST, "/players").permitAll()
-				.anyRequest()
-				.authenticated()
-				/*.and()
-				.httpBasic()*/
-				.and()
-				.sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
-				.addFilter(jwtAuthenticationFilter)
-				.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-				.build();
+
+		return http.csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, "/players").permitAll()
+				.anyRequest().authenticated().and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilter(jwtAuthenticationFilter)
+				.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
-	
+
 	@Bean
 	AuthenticationManager authManager(HttpSecurity http) throws Exception {
-		return http.getSharedObject(AuthenticationManagerBuilder.class)
-				.userDetailsService(userDetailsService)
-				.passwordEncoder(passwordEncoder())
-				.and()
-				.build();
+		return http.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(userDetailsService)
+				.passwordEncoder(passwordEncoder()).and().build();
 	}
-	
+
 	@Bean
-	PasswordEncoder passwordEncoder(){
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-	/*protected void configure(HttpSecurity http) throws Exception {
-	http.csrf().disable()
-		.addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
-		.authorizeRequests()
-		.antMatchers(HttpMethod.POST, "/players").permitAll()
-		.anyRequest().authenticated();
-}*/
-	
-	/*
-	@Bean
-	UserDetailsService userDetailsService() {
-		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-		manager.createUser(User.withUsername("admin")
-		.password(passwordEncoder().encode("admin"))
-		.roles()
-		.build());
-		return manager;
-	}
-	*/
-	
-	/*public static void main (String[] args) {
-		System.out.println("pass : " + new BCryptPasswordEncoder().encode("Pepe"));
-	}*/
-
 }
